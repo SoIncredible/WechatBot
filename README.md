@@ -106,6 +106,75 @@ wechatyTest/
 
 确保机器人账号已加入群聊，并且在消息中正确 @ 了机器人。
 
+## 部署到云服务器
+
+本项目提供了完整的一键部署方案，可以快速将机器人部署到云服务器。
+
+### 快速部署步骤
+
+1. **准备服务器**
+   ```bash
+   # 上传setup脚本到服务器并执行
+   scp setup-server.sh user@server-ip:/tmp/
+   ssh user@server-ip
+   chmod +x /tmp/setup-server.sh
+   /tmp/setup-server.sh
+   ```
+
+2. **配置部署脚本**
+   
+   编辑 `deploy-bot.sh`，修改服务器信息：
+   ```bash
+   SERVER_HOST="your-server-ip"
+   SERVER_USER="root"
+   SERVER_PATH="/opt/wechaty-bot"
+   SERVER_PORT="22"
+   ```
+
+3. **执行部署**
+   ```bash
+   ./deploy-bot.sh
+   ```
+
+4. **查看运行状态**
+   ```bash
+   ssh user@server-ip
+   monitor-bot status
+   ```
+
+### 监控工具
+
+项目提供了两套监控脚本：
+
+**本地开发监控** (`view-local-logs.sh`)：
+```bash
+./view-local-logs.sh watch       # 持续监控（推荐）
+./view-local-logs.sh dashboard   # 监控面板
+./view-local-logs.sh recent 100  # 查看最近100行
+./view-local-logs.sh errors      # 查看错误
+```
+
+**服务器监控** (`monitor-bot.sh`)：
+```bash
+monitor-bot watch       # 持续监控（推荐）
+monitor-bot dashboard   # 监控面板
+monitor-bot status      # 查看状态
+monitor-bot start       # 启动机器人
+monitor-bot stop        # 停止机器人
+monitor-bot restart     # 重启机器人
+```
+
+详细部署说明请查看 [部署说明.md](./部署说明.md)
+
+## 脚本说明
+
+| 脚本 | 说明 |
+|-----|------|
+| `setup-server.sh` | 服务器依赖安装脚本 |
+| `deploy-bot.sh` | 一键部署脚本 |
+| `monitor-bot.sh` | 服务器监控工具 |
+| `view-local-logs.sh` | 本地日志查看工具 |
+
 ## 许可证
 
 MIT
