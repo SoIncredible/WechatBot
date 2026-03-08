@@ -63,55 +63,72 @@ wechaty
     console.log(`用户 ${user} 登录成功`)
   })
   .on('message', async message => {
+    const room = message.room(); // 获取群聊对象
+    const contact = message.from(); // 获取发送者
     try {
-      console.log(`收到消息: ${message}`)
-      
+      console.log(`收到消息: ${message}`);
+
       // 跳过自己发的消息
       if (message.self()) {
-        return
+        return;
       }
 
       // 获取消息内容
-      const text = message.text()
-      const room = message.room() // 获取群聊对象
-      const contact = message.from() // 获取发送者
+      const text = message.text();
 
       // 私聊处理
       if (!room) {
-        console.log(`[私聊] 来自 ${contact.name()}: ${text}`)
-        
+        console.log(`[私聊] 来自 ${contact.name()}: ${text}`);
+
+        let reply = "别急, 我在烧烤🍖...";
+        console.log(`回复: ${reply}`);
+
+        // 在群里回复（会自动@发送者）
+        message.say(reply, contact);
+
         // 调用Kimi API获取回复
-        const reply = await callKimiAPI(text)
-        console.log(`[私聊] 回复: ${reply}`)
-        
+        reply = await callKimiAPI(text);
+        console.log(`[私聊] 回复: ${reply}`);
+
         // 发送回复
-        await message.say(reply)
-      } 
+        await message.say(reply);
+      }
       // 群聊处理
       else {
-        const topic = await room.topic()
-        console.log(`[群聊] ${topic} - ${contact.name()}: ${text}`)
-        
+        const topic = await room.topic();
+        console.log(`[群聊] ${topic} - ${contact.name()}: ${text}`);
+
         // 检查是否被@
-        const mentionSelf = await message.mentionSelf()
-        
+        const mentionSelf = await message.mentionSelf();
+
         if (mentionSelf) {
-          console.log(`[群聊] 机器人被@了`)
-          
-          // 获取@之后的消息内容
-          const mentionText = await message.mentionText()
-          console.log(`[群聊] 提取的内容: ${mentionText}`)
-          
-          // 调用Kimi API获取回复
-          const reply = await callKimiAPI(mentionText)
-          console.log(`[群聊] 回复: ${reply}`)
-          
+          let reply = "别急, 我在烧烤🍖...";
+          console.log(`回复: ${reply}`);
+
           // 在群里回复（会自动@发送者）
-          await room.say(reply, contact)
+          room.say(reply, contact);
+
+          console.log(`[群聊] 机器人被@了`);
+
+          // 获取@之后的消息内容
+          const mentionText = await message.mentionText();
+          console.log(`[群聊] 提取的内容: ${mentionText}`);
+
+          // 调用Kimi API获取回复
+          reply = await callKimiAPI(mentionText);
+          console.log(`[群聊] 回复: ${reply}`);
+
+          // 在群里回复（会自动@发送者）
+          await room.say(reply, contact);
         }
       }
     } catch (error) {
-      console.error('处理消息时出错:', error)
+      console.error("处理消息时出错:", error);
+      if (!room) {
+        message.say("我晕了😵‍💫, 没听懂你在说什么", contact);
+      } else {
+        room.say("我晕了😵‍💫, 没听懂你在说什么", contact);
+      }
     }
   })
 
